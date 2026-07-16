@@ -593,6 +593,7 @@ export async function renderBundledRootHelpText(
     cwd: _distDirOverride,
     encoding: "utf8",
     env: renderContext.env,
+    killSignal: "SIGKILL",
     timeout: ROOT_HELP_RENDER_TIMEOUT_MS,
   });
   if (result.error) {
@@ -633,6 +634,7 @@ function renderSourceRootHelpText(
       cwd: rootDir,
       encoding: "utf8",
       env: renderContext.env,
+      killSignal: "SIGKILL",
       timeout: ROOT_HELP_RENDER_TIMEOUT_MS,
     },
   );
@@ -899,6 +901,7 @@ function hasAllPrecomputedSubcommandHelpText(value: unknown): boolean {
 }
 
 export const testing = {
+  renderSourceRootHelpText,
   signalCliStartupMetadataProcessTree,
   spawnText,
 };
