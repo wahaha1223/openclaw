@@ -83,9 +83,9 @@ beforeEach(() => vi.clearAllMocks());
 
 it.each([
   [
-    "sessions --active 5 cleanup",
+    "sessions --active 5 --archived cleanup",
     mocks.cleanup,
-    "`sessions cleanup` does not support the parent `sessions` option --active; session-list filters cannot scope session maintenance.",
+    "`sessions cleanup` does not support the parent `sessions` options --active, --archived; session-list filters cannot scope session maintenance.",
   ],
   [
     `sessions --store /tmp/other.sqlite archive ${key}`,
@@ -134,9 +134,9 @@ it("rejects an invalid probe timeout without dispatch", async () => {
 
 it.each([
   [
-    "--json --verbose --agent work --all-agents --active 120 --limit 25 list",
+    "--json --verbose --agent work --all-agents --active 120 --archived --limit 25 list",
     mocks.list,
-    { json: true, agent: "work", allAgents: true, active: "120", limit: "25" },
+    { json: true, agent: "work", allAgents: true, active: "120", archived: true, limit: "25" },
   ],
   [
     `--all-agents --json cleanup --dry-run --enforce --fix-missing --fix-dm-scope --active-key ${key}`,
@@ -174,6 +174,14 @@ it.each([
   if (owner === mocks.list) {
     expect(mocks.setVerbose).toHaveBeenCalledWith(true);
   }
+});
+
+it.each([
+  ["list --archived --store /tmp/sessions.sqlite", { store: "/tmp/sessions.sqlite" }],
+  ["--archived --agent work", { agent: "work" }],
+] as const)("forwards the archive filter for sessions %s", async (args, scope) => {
+  await run(`sessions ${args} --json`);
+  expectOptions(mocks.list, { ...scope, archived: true, json: true });
 });
 
 it("compact inherits parent agent and JSON options (#91378)", async () => {

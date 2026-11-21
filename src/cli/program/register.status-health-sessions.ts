@@ -23,6 +23,7 @@ const SESSIONS_PARENT_OPTION_FLAGS = {
   agent: "--agent",
   allAgents: "--all-agents",
   active: "--active",
+  archived: "--archived",
   limit: "--limit",
 } satisfies Record<keyof SessionsListCliOptions, string>;
 
@@ -55,6 +56,7 @@ function addSessionsListOptions(command: Command): Command {
     .option("--agent <id>", "Agent id to inspect (required for multiple explicit agents)")
     .option("--all-agents", "Aggregate sessions across all configured agents", false)
     .option("--active <minutes>", "Only show sessions updated within the past N minutes")
+    .option("--archived", "Only show archived sessions", false)
     .option("--limit <count>", 'Max sessions to show (default: 100; use "all" for full output)');
 }
 
@@ -161,7 +163,7 @@ function registerSessionsLifecycleCommand(
       rejectUnsupportedSessionsParentOptions(
         operation,
         parentOpts,
-        ["store", "allAgents", "active", "limit", "verbose"],
+        ["store", "allAgents", "active", "archived", "limit", "verbose"],
         "the gateway resolves target stores from each key and --agent",
       );
       const timeoutMs = parseStrictPositiveInteger(opts.timeout);
@@ -300,6 +302,7 @@ export function registerStatusHealthSessionsCommands(program: Command) {
       agent: opts.agent ?? parentOpts?.agent,
       allAgents: Boolean(opts.allAgents || parentOpts?.allAgents),
       active: opts.active ?? parentOpts?.active,
+      archived: Boolean(opts.archived || parentOpts?.archived),
       limit: opts.limit ?? parentOpts?.limit,
     });
   });
@@ -351,7 +354,7 @@ export function registerStatusHealthSessionsCommands(program: Command) {
     .action(
       localSessionsAction(
         "cleanup",
-        ["active", "limit", "verbose"],
+        ["active", "archived", "limit", "verbose"],
         "session-list filters cannot scope session maintenance",
         async () => (await import("../../commands/sessions-cleanup.js")).sessionsCleanupCommand,
       ),
@@ -375,7 +378,7 @@ export function registerStatusHealthSessionsCommands(program: Command) {
     .action(
       localSessionsAction(
         "tail",
-        ["json", "active", "limit", "verbose"],
+        ["json", "active", "archived", "limit", "verbose"],
         "trajectory tail emits human-readable progress and selects sessions separately",
         async () => (await import("../../commands/sessions-tail.js")).sessionsTailCommand,
       ),
@@ -394,7 +397,7 @@ export function registerStatusHealthSessionsCommands(program: Command) {
     .action(
       localSessionsAction(
         "export-trajectory",
-        ["allAgents", "active", "limit", "verbose"],
+        ["allAgents", "active", "archived", "limit", "verbose"],
         "trajectory export targets one session and cannot apply session-list filters",
         async () => (await import("../../commands/export-trajectory.js")).exportTrajectoryCommand,
       ),
@@ -435,7 +438,7 @@ export function registerStatusHealthSessionsCommands(program: Command) {
         rejectUnsupportedSessionsParentOptions(
           "import",
           parentOpts,
-          ["store", "allAgents", "active", "limit", "verbose"],
+          ["store", "allAgents", "active", "archived", "limit", "verbose"],
           "catalog imports use Gateway sources; pass --limit after import to bound --all",
         );
         await runCommandWithRuntime(defaultRuntime, async () => {
@@ -486,7 +489,7 @@ export function registerStatusHealthSessionsCommands(program: Command) {
       rejectUnsupportedSessionsParentOptions(
         "compact",
         parentOpts,
-        ["store", "allAgents", "active", "limit", "verbose"],
+        ["store", "allAgents", "active", "archived", "limit", "verbose"],
         "the gateway resolves the target store from <key> and --agent",
       );
       const maxLines = parseStrictPositiveInteger(opts.maxLines);

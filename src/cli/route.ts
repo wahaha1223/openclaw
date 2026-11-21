@@ -236,7 +236,7 @@ function parseGatewayHealthRouteArgs(argv: string[]) {
 function parseSessionsRouteArgs(argv: string[]) {
   const values = parseRoutedValueFlags(argv, {
     commandPath: ["sessions"],
-    booleanFlags: ["--json", "--all-agents"],
+    booleanFlags: ["--json", "--all-agents", "--archived"],
     valueFlags: ["--agent", "--store", "--active", "--limit"],
   });
   if (!values) {
@@ -248,6 +248,7 @@ function parseSessionsRouteArgs(argv: string[]) {
     agent: values.get("--agent"),
     store: values.get("--store"),
     active: values.get("--active"),
+    archived: hasFlag(argv, "--archived"),
     limit: values.get("--limit"),
   };
 }

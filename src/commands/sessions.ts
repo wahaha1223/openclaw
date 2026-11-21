@@ -167,6 +167,7 @@ export async function sessionsCommand(
     json?: boolean;
     store?: string;
     active?: string;
+    archived?: boolean;
     agent?: string;
     allAgents?: boolean;
     limit?: string | number;
@@ -206,7 +207,11 @@ export async function sessionsCommand(
       storePath: target.storePath,
       projection: "list",
     })
-      .filter(({ entry }) => activeSince === undefined || entry.updatedAt >= activeSince)
+      .filter(
+        ({ entry }) =>
+          (!opts.archived || entry.archivedAt !== undefined) &&
+          (activeSince === undefined || entry.updatedAt >= activeSince),
+      )
       .map(({ sessionKey, entry }) => ({ agentId: target.agentId, entry, sessionKey }));
   });
   const totalCount = allEntries.length;

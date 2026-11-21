@@ -57,6 +57,7 @@ Flags:
 | `--all-agents`       | Aggregate all configured agent stores.                              |
 | `--store <path>`     | Legacy store selector path (cannot combine with `--all-agents`).    |
 | `--active <minutes>` | Only show sessions updated within the past N minutes.               |
+| `--archived`         | Only show archived sessions.                                        |
 | `--limit <n\|all>`   | Max rows to output (default `100`; `all` restores full output).     |
 | `--json`             | Machine-readable output.                                            |
 | `--verbose`          | Verbose logging.                                                    |
@@ -79,6 +80,11 @@ loop. The CLI returns the newest 100 sessions by default; pass `--limit <n>`
 for a smaller/larger window or `--limit all` when you intentionally need the
 full store. JSON responses include `totalCount`, `limitApplied`, and `hasMore`
 when callers need to show that more rows exist.
+
+To find archived session keys while the Gateway is stopped, run
+`openclaw sessions list --archived --json` against the local store. The CLI
+applies the archive filter before `--limit`, so `count`, `totalCount`, and
+`hasMore` describe the filtered list.
 
 JSON session rows include `color` when a session color is set (for example,
 `"color": "blue"`). Uncolored sessions and sessions whose color was cleared omit

@@ -569,6 +569,24 @@ describe("sessionsCommand", () => {
     ]);
   });
 
+  it("filters archived sessions before counting and limiting the list", async () => {
+    const store = await writeStore({
+      "agent:main:active": makeSession("active", { updatedAt: Date.now() }),
+      "agent:main:archived": makeSession("archived", { archivedAt: Date.now() - 30_000 }),
+    });
+    const { runtime, logs } = makeRuntime();
+
+    await sessionsCommand({ store, json: true, archived: true, limit: "1" }, runtime);
+
+    expect(JSON.parse(logs[0] ?? "{}")).toMatchObject({
+      count: 1,
+      totalCount: 1,
+      limitApplied: 1,
+      hasMore: false,
+      sessions: [{ key: "agent:main:archived" }],
+    });
+  });
+
   it.each([
     {
       name: "partially numeric active minutes",

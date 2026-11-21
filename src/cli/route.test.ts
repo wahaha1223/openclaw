@@ -108,13 +108,14 @@ describe("tryRouteCli", () => {
       { deep: false, all: false, usage: false, timeoutMs: undefined },
     ],
     [
-      "sessions --agent=default --limit=25",
+      "sessions --agent=default --archived --limit=25",
       {
         json: false,
         allAgents: false,
         agent: "default",
         store: undefined,
         active: undefined,
+        archived: true,
         limit: "25",
       },
     ],
